@@ -45,6 +45,11 @@ io.on('connection', function (socket) {
         socket.broadcast.emit('enemy_moved', players[socket.id]);
     });
 
+    socket.on('new_bullet', function(bullet_data) {
+        socket.emit('new_bullet', bullet_data);
+        socket.broadcast.emit('new_bullet', bullet_data);
+    });
+
     socket.on('disconnect', function () {
         console.log("User has disconnected!");
         delete players[socket.id];

@@ -42,6 +42,7 @@ function create() {
     self = this;
 
     this.enemies = this.physics.add.group();
+    this.bullets = this.physics.add.group();
 
     this.io.on('actualPlayers', function (players) {
         Object.keys(players).forEach(function (id) {
@@ -63,12 +64,16 @@ function create() {
 
     this.io.on('enemy_moved', function(player_data) {
         enemies_ref.getChildren().forEach(function(enemy) {
-           if(player_data.player_id == enemy.id) {
-               enemy.setPosition(player_data.x, player_data.y);
-               enemy.setAngle(player_data.angle);
-           }
+            if (player_data.player_id == enemy.id) {
+                enemy.setPosition(player_data.x, player_data.y);
+                enemy.setAngle(player_data.angle);
+            }   
         });
-    })
+    });
+
+    this.io.on('new_bullet', function(bullet_data) {
+        new Shot(self.scene, bullet_data.x, bullet_data.y, bullet_data.angle);
+    });
 
     //this.player = new Player(this, 500, 500);
 }
