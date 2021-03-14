@@ -58,6 +58,18 @@ function create() {
     this.io.on('new_player', function(pInfo) {
         createEnemy(self.scene, pInfo)
     });
+
+    enemies_ref = this.enemies;
+
+    this.io.on('enemy_moved', function(player_data) {
+        enemies_ref.getChildren().forEach(function(enemy) {
+           if(player_data.player_id == enemy.id) {
+               enemy.setPosition(player_data.x, player_data.y);
+               enemy.setAngle(player_data.angle);
+           }
+        });
+    })
+
     //this.player = new Player(this, 500, 500);
 }
 
@@ -73,7 +85,7 @@ function createPlayer(scene, x, y) {
 }
 
 function createEnemy(scene, enemy_info) {
-    const enemy = new Enemy(scene, enemy_info.x, enemy_info.y, enemy_info.id);
+    const enemy = new Enemy(scene, enemy_info.x, enemy_info.y, enemy_info.player_id);
     scene.enemies.add(enemy);
 
 }

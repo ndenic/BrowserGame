@@ -11,6 +11,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.playerSpeed = 600;
         this.depth = 5;
 
+        // holds scene
+        this.scene = scene;
+
         this.setInteractive();
         this.setCollideWorldBounds(true);
 
@@ -33,6 +36,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             var a = new Shot(self.scene, self.x, self.y, self.angle);
         });
 
+        this.old_x = this.x;
+        this.old_y = this.y;
+        this.old_angle = this.angle;
+
     }
     update() {
         this.setVelocity(0, 0);
@@ -47,6 +54,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityX(this.playerSpeed)
         } else if (this.keyLeft.isDown) {
             this.setVelocityX(this.playerSpeed * -1);
+        }
+        var x = this.x;
+        var y = this.y;
+        var angle = this.angle;
+
+        if(x != this.old_x || y != this.old_y || angle != this.old_angle) {
+           // send socket to server
+           this.scene.io.emit('player_move', {x: x, y: y, angle: angle});
+           this.old_x = x;
+           this.old_y = y;
+           this.old_angle = angle;
         }
     }
 }
