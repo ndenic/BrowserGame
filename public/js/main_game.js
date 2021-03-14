@@ -27,18 +27,53 @@ var config = {
 //holds a game instance
 var game = new Phaser.Game(config);
 var player;
+var player_init = false;
 
 function preload() {
     // loading images
     this.load.image('player', 'public/img/player.png');
     this.load.image('bullet', 'public/img/bullet.png');
-
+    this.load.image('enemy', 'public/img/enemy.png');
 }
 
 function create() {
-    this.player = new Player(this, 500, 500);
+    this.io = io();
+
+    self = this;
+
+    this.enemies = this.physics.add.group();
+
+    this.io.on('actualPlayers', function (players) {
+        Object.keys(players).forEach(function (id) {
+            if (players[id].player_id == self.io.id) {
+                alert('Usli smo u niz braco');
+                createPlayer(self, players[id].x, players[id].y);
+            } else {
+                // pravimo druge igrace...
+                createEnemy(self, players[id]);
+            }
+        });
+    });
+
+    this.io.on('new_player', function(pInfo) {
+        createEnemy(self.scene, pInfo)
+    });
+    //this.player = new Player(this, 500, 500);
 }
 
 function update() {
-    this.player.update();
+    if (this.player_init == true) {
+        this.player.update();
+    }
+}
+
+function createPlayer(scene, x, y) {
+    scene.player_init = true;
+    scene.player = new Player(scene, x, y);
+}
+
+function createEnemy(scene, enemy_info) {
+    const enemy = new Enemy(scene, enemy_info.x, enemy_info.y, enemy_info.id);
+    scene.enemies.add(enemy);
+
 }
